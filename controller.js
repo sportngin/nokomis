@@ -7,6 +7,7 @@ module.exports = Controller
 
 var _ = require('underscore')
 var extendable = require('extendable')
+var Plugin = require('./plugins')
 
 function Controller(options) {
   this.res = options.res
@@ -14,6 +15,10 @@ function Controller(options) {
   this.config = options.config
   this.route = options.route
   this.templating = options.templating
+
+  this.runPlugins()
+
+  this.req.on('timeout', this.timeout.bind(this))
 
   this.model = {}
 
@@ -45,15 +50,19 @@ _.extend(Controller.prototype, {
     var preferredType = mediaType || this.req.contentNegotiator.preferredMediaType(this.availableMediaTypes)
 
     if (/html$/.test(preferredType)) {
-      return this.html()
+      var html = this.render()
+      if (this.html) return this.html(html)
+      throw 'No `html` method implemented'
     }
 
     if (/json$/.test(preferredType)) {
-      return this.json()
+      if (this.json) return this.json(this.model)
+      throw 'No `json` method implemented'
     }
 
     if (/xml$/.test(preferredType)) {
-      return this.xml()
+      if (this.xml) return this.xml(this.model)
+      throw 'No `xml` method implemented'
     }
 
     // no match, try with the default media type
@@ -90,26 +99,6 @@ _.extend(Controller.prototype, {
     // throw 'Template render method not implemented'
   },
 
-  // Output the model in JSON format.
-  // Override this method to provide alternate
-  // behavior such as limiting the data provided
-  // in the model.
-  json: function() {
-    if (this.res.json)
-      return this.res.json(this.model)
-    throw 'JSON response method not implemented'
-  },
-
-  // Output the model in XML format.
-  // Override this method to provide alternate
-  // behavior such as limiting the data provided
-  // in the model.
-  xml: function() {
-    if (this.res.xml)
-      return this.res.xml(this.model)
-    throw 'XML response method not implemented'
-  },
-
   // Output an error response to the client.
   // Override this method to provide alternate
   // behavior.
@@ -117,6 +106,10 @@ _.extend(Controller.prototype, {
     if (this.res.error)
       return this.res.error.apply(this.res, arguments)
     throw 'error response method not implemented'
+  },
+
+  timeout: function() {
+
   },
 
 
@@ -152,3 +145,4 @@ _.extend(Controller.prototype, {
 })
 
 Controller.extend = extendable
+Plugin.makePluggable(Controller)
