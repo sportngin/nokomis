@@ -1,16 +1,10 @@
 
-
-
 var fs = require('fs')
 var path = require('path')
 var glob = require('glob')
 var async = require('async')
 var _ = require('underscore')
 var extendable = require('extendable')
-
-var cache = {}
-var templatePath = './templates/'
-
 
 // Provide a basic compliant templating engine
 var engine = {
@@ -22,18 +16,16 @@ var engine = {
 }
 
 
-function Templating() {
 
+function Templating() {
+  this.cache = _.extend({}, this.cache)
 }
 
 _.extend(Templating.prototype, {
 
   engine: engine,
-
-  setPath: function(p) {
-    templatePath = p
-    console.log('TEMPLATE PATH', templatePath)
-  },
+  templatePath: '../../app/templates',
+  cache: {},
 
   render: function(tmpl, data, options, callback) {
     var self = this
@@ -58,44 +50,44 @@ _.extend(Templating.prototype, {
   renderTemplate: function(template, data, callback) {
       var result, error
       try {
-        result = template(data, options)
+        result = template(data)
       } catch(e) {
+        console.error(e)
         error = e
       }
       callback(error, result)
   },
 
-  loadTemplate: function(tmpl, options, callback) {
+  loadTemplate: function(tmplName, options, callback) {
     var self = this
+    // normalize tmplName with the specified extension
+    if (this.extension && !~tmplName.indexOf('.'+this.extension))
+      tmplName += '.' + this.extension
 
-    // normalize tmpl with the specified extension
-    if (this.extension && !~tmpl.indexOf('.'+this.extension))
-      tmpl + '.' + this.extension
-
-    if (cache[tmpl]) return callback(null, cache[tmpl])
+    if (this.cache[tmplName]) return callback(null, this.cache[tmplName])
 
     if (typeof options == 'function') {
       callback = options
-      options = null
+      options = {}
     }
 
-    var filePath = path.resolve(templatePath, tmpl)
+    var filePath = path.resolve(this.templatePath, tmplName)
     fs.readFile(filePath, 'utf8', function(err, data) {
       if (err) {
-        console.error('Error loading template [Templating::loadTemplate]')
+        console.error('Error loading template [Templating::loadTemplate]', filePath)
         console.error(err)
         callback(err)
       }
 
-      cache[tmpl] = self.engine.compile(data, options)
-      callback(null, cache[tmpl])
+      var template = self.cache[tmplName] = self.engine.compile(data, options)
+      callback(null, template)
     })
   },
 
   preload: function(match, callback) {
     var self = this
     match = match || '**/*'
-    glob(match, {cwd:templatePath}, function(err, files) {
+    glob(match, {cwd:this.templatePath}, function(err, files) {
       async.forEach(files, function(file, callback) {
         self.loadTemplate(file, callback)
       }, function(err) {

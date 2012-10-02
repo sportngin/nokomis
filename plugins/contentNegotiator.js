@@ -1,11 +1,11 @@
 
-var Plugin = require('../plugins')
+var Plugin = require('../plugin')
 var Negotiator = require('negotiator')
 
 var ContentNegotiator = module.exports = Plugin.extend({
 
-  run: function() {
-    this._neg = new Negotiator(this.req)
+  run: function(instance) {
+    instance._neg = new Negotiator(instance.req)
   },
 
   preferredMediaType: function() {

@@ -1,15 +1,18 @@
 
-var Plugin = require('../plugins')
+var Plugin = require('../plugin')
 var Cookies = require('cookies')
+var Keygrip = require('keygrip')
 
 module.exports = Plugin.extend({
 
   initialize: function(config) {
-    this._keyconfig.keys
+    this.cookieKeys = new Keygrip(config.secrets)
   },
 
   run: function(instance) {
-    instance.cookies = new Cookies(instance.req, instance.res, config.cookiesKeys)
+    var req = instance.req
+    var res = instance.res
+    instance.cookies = req.cookies = new Cookies(req, res, this.cookieKeys)
   }
 
 })

@@ -1,19 +1,20 @@
 
-var Plugin = require('../plugins')
+var Plugin = require('../plugin')
 var Domain = require('domain')
 var ErrorPage = require('error-page')
-
+var _ = require('underscore')
 
 
 module.exports = Plugin.extend({
 
   initialize: function(config) {
-    this._keyconfig.keys
+    this.config = config
   },
 
   run: function(instance) {
     var req = instance.req
     var res = instance.res
+    var config = this.config
 
     var defaultErrorPageConfig = {
       404: handle404.bind(instance),
@@ -23,7 +24,7 @@ module.exports = Plugin.extend({
     }
 
     // setup error-page module
-    var errorPageConfig = _.extend(defaultErrorPageConfig, config.errorPage)
+    var errorPageConfig = _.extend(defaultErrorPageConfig, config)
     instance.error = new ErrorPage(req, res, errorPageConfig)
 
     // Use a node Domain to handle all

@@ -1,5 +1,5 @@
 
-var Plugin = require('../plugins')
+var Plugin = require('../plugin')
 
 var Respond = module.exports = Plugin.extend({
 
@@ -35,13 +35,14 @@ var Respond = module.exports = Plugin.extend({
    */
 
   send: function (data, status, headers) {
-    this.res.statusCode = this.res.statusCode || status
+    var res = this.res
+    res.statusCode = res.statusCode || status
     if (headers) Object.keys(headers).forEach(function (h) {
-      this.res.setHeader(h, headers[h])
+      res.setHeader(h, headers[h])
     })
     if (!Buffer.isBuffer(data)) data = new Buffer(data)
-    this.res.setHeader('content-length', data.length)
-    this.res.end(data)
+    res.setHeader('content-length', data.length)
+    res.end(data)
   },
 
   /**

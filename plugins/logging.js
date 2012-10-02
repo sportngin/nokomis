@@ -1,12 +1,12 @@
 
-var Plugin = require('../plugins')
+var Plugin = require('../plugin')
 var crypto = require('crypto')
 var bunyan = require('bunyan')
 
 module.exports = Plugin.extend({
 
   initialize: function(config) {
-    this._logger = bunyan.createLogger(config.log || { name:'Nokomis App' })
+    this._logger = bunyan.createLogger(config || { name:'Nokomis App' })
   },
 
   run: function(instance) {

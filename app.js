@@ -18,9 +18,6 @@ function App(config) {
   this.templating = new Templating()
 
   this.setupRoutes(this.router)
-  this.setupMiddleware(this.middleware)
-  this.setupTemplating(this.templating)
-
   this.setupHttpServer()
 
   this.initialize.apply(this, arguments)
@@ -30,8 +27,6 @@ _.extend(App.prototype, {
 
   initialize: function() {},
   setupRoutes: function() {},
-  setupMiddleware: function() {},
-  setupTemplating: function() {},
 
   // initializes the http server for this app instance
   setupHttpServer: function() {
@@ -63,9 +58,6 @@ _.extend(App.prototype, {
     var route = req.route = this.router.match(normalPathname)
 
     var run = function() {
-      // run middleware
-      this.middleware.load(req, res, this.config)
-
       // without a matching route, send a 404
       if (!route) {
         console.log('No route matched for ' + normalPathname)
@@ -77,7 +69,6 @@ _.extend(App.prototype, {
         req: req,
         res: res,
         route: route,
-        templating: this.templating,
         config: this.config
       })
     }.bind(this)

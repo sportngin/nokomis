@@ -3,4 +3,6 @@ exports.Controller = require('./controller')
 exports.Templating = require('./templating')
 exports.Router = require('./router')
 exports.Middleware = require('./middleware')
-exports.Plugin = require('./plugins')
+exports.Plugin = require('./plugin')
+
+exports.plugins = require('./plugins')

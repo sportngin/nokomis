@@ -4,7 +4,7 @@
 // However, node-formidable does not have json upload support so
 // it will need to be patched.
 
-var Plugin = require('../plugins')
+var Plugin = require('../plugin')
 var qs = require('querystring')
 var StringDecoder = require('string_decoder').StringDecoder
 

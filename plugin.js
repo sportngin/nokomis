@@ -2,11 +2,11 @@
 var extendable = require('extendable')
 var _ = require('underscore')
 
-var Plugin = function(Class) {
-  var methods = _.clone(this.prototype)
-  _.each(['initialize', 'run'], function(m) { delete methods[m] })
-  _.defaults(Class.prototype, this.prototype)
-  this.initialize.apply(this, arguments)
+var Plugin = function(Class, args) {
+  var methods = _.clone(this)
+  _.each(['constructor', 'initialize', 'run'], function(m) { delete methods[m] })
+  _.defaults(Class.prototype, methods)
+  this.initialize.apply(this, args)
 }
 
 // Instance members
@@ -47,7 +47,7 @@ _.extend(Plugin, {
     // Class that is made 'pluggable'
     _.extend(Class, {
       addPlugin: function(PluginClass) {
-        plugins.push(new PluginClass(_.rest(arguments)))
+        plugins.push(new PluginClass(Class, _.rest(arguments)))
       }
     })
   }
