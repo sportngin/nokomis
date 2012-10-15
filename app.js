@@ -1,6 +1,5 @@
 var http = require('http')
 var path = require('path')
-var url = require('url')
 var Domain = require('domain')
 
 var _ = require('underscore')
@@ -49,9 +48,7 @@ _.extend(App.prototype, {
   handleRequest: function(req, res) {
 
     // match a controller from the router
-    var pathname = url.parse(req.url).pathname
-    var normalPathname = path.normalize(pathname)
-    var route = req.route = this.router.match(normalPathname)
+    var route = req.route = this.router.match(req)
 
     var run = function() {
       // without a matching route, send a 404
