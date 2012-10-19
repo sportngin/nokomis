@@ -10,6 +10,7 @@ var router = new (require('routes').Router)()
 var _ = require('underscore')
 var routes = exports.routes = {}
 var controllerPath = '../controllers/'
+var VERBS = ['HEAD','GET','POST','PUT','DELETE','TRACE','OPTIONS','CONNECT','PATCH']
 
 /**
  * Registers a series of routes and their
@@ -31,6 +32,7 @@ exports.register = function(rte, ctlr) {
 
   _.extend(routes, rts)
 
+
   Object.keys(rts).forEach(function(route) {
     // define each route and provide a custom handler for it
     // router.define(route, function() {
@@ -40,12 +42,13 @@ exports.register = function(rte, ctlr) {
       var handler = rts[route]
 
       // test for HTTP method
-      if (!testHTTPMethod(method, handler.method)) return null
+      if (!testHTTPMethod(method, handler)) return null
 
-      var controller = require(controllerPath + handler.controller)
-      this.route = route
+      var controller  = require(controllerPath + handler.controller)
       this.controller = controller
-      if (handler.action) this.action = handler.action
+      this.route      = route
+      this.action     = handler[method] || handler.action || undefined
+
       // remove `fn` which is this function
       delete this.fn
       return this
@@ -98,8 +101,17 @@ exports.setControllerPath = function(path) {
  * @api public
  */
 
-function testHTTPMethod(method, expected) {
-  if (!expected || _.isEmpty(expected)) return true
-  if (!Array.isArray(expected)) expected = [expected]
-  return !!~expected.indexOf(method)
+function testHTTPMethod(method, handler) {
+  var expected = handler.method
+
+  // check to see if methods hasn't been set as a string, an array, or as a key on the handler
+  if (!expected && !handler[method]) {
+    // if so, we need to reject verbs that haven't been explicitly set...
+    if (_.intersection(_.keys(handler), VERBS).length) return false
+  }
+
+  // ...otherwise, we're dealing with a more generic route
+  if (!expected || _.isEmpty(expected)) return true   // if it went this far, this generic route test should suffice
+  if (!Array.isArray(expected)) expected = [expected] // otherwise, convert the expected methods to an array if necessary
+  return !!~expected.indexOf(method)                  // check for the sent method in the declaration of acceptable methods
 }
