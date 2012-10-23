@@ -30,7 +30,7 @@ function Controller(options) {
   this._done = this._done.bind(this)
   options.done = this._done
 
-  this._defaultMediaType = this.config.defaultMediaType || 'text/html'
+  this._defaultMediaType = this.config && this.config.defaultMediaType || 'text/html'
 
   this.initialize.apply(this, arguments)
 
