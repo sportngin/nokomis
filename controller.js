@@ -64,12 +64,12 @@ _.extend(Controller.prototype, EventEmitter.prototype, {
     }
 
     if (/json$/.test(preferredType)) {
-      if (this.json) return this.json(this.model)
+      if (this.json) return this.json(this.serialize())
       throw 'No `json` method implemented'
     }
 
     if (/xml$/.test(preferredType)) {
-      if (this.xml) return this.xml(this.model)
+      if (this.xml) return this.xml(this.serialize())
       throw 'No `xml` method implemented'
     }
 
