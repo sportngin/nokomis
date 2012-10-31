@@ -51,9 +51,10 @@ _.extend(Controller.prototype, EventEmitter.prototype, {
 
   // Determines the best response type based on what the
   // client can accept and what the controller can output.
-  _render: function(mediaType) {
+  _render: function() {
     var self = this
-    var preferredType = mediaType || this.preferredMediaType(this.availableMediaTypes)
+
+    var preferredType = this.mediaType()
 
     if (/html$/.test(preferredType)) {
       return this.render(function(err, html){
@@ -73,12 +74,14 @@ _.extend(Controller.prototype, EventEmitter.prototype, {
       throw 'No `xml` method implemented'
     }
 
-    // no match, try with the default media type
-    if (!mediaType) return this._render(this._defaultMediaType)
-
-    return this.res.end('No media type matched')
+    this.error(415, 'Media type not supported')
   },
 
+  // Determines the media type to respond with. Override
+  // with your own content negotiation code.
+  mediaType: function() {
+    return this._defaultMediaType
+  },
 
   // Initialize is an empty method by default. Override
   // it with your own initialization logic.
@@ -100,6 +103,27 @@ _.extend(Controller.prototype, EventEmitter.prototype, {
   template: null,
   templateOptions: {
     layout: 'layout'
+  },
+
+  // A stub for rendering content from a template. Override
+  // with your own rendering code.
+  render: function() {
+    return ''
+  },
+
+  error: function() {
+    var args = Array.prototype.slice.call(arguments)
+    var status = 500
+    var message = 'An error occured'
+    args.forEach(function(v) {
+      if (typeof v === 'string')
+        message = v
+      else if (typeof v === 'number')
+        status = v
+    })
+    this.res.setHeader('content-type', 'text/plain')
+    this.res.statusCode = status
+    this.res.end(message)
   },
 
   // Call this in your initialize function to enforce

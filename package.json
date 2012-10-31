@@ -1,23 +1,16 @@
 {
   "name" : "nokomis",
-  "version" : "0.0.2",
+  "version" : "0.1.0",
   "description" : "A less opinionated web framework for node",
   "main" : "./index.js",
   "dependencies" : {
     "async" : "*",
     "bunyan": "*",
     "cluster-master" : ">=0.0.10",
-    "cookies": "~0.2.2",
-    "error-page" : "*",
     "extendable" : ">=0.0.3",
-    "filed": "0",
     "glob": "3",
-    "keygrip": "~0.2.0",
-    "negotiator": "~0.2.3",
-    "request" : "*",
     "routes" : "*",
-    "underscore" : "*",
-    "request-timeout" : "*"
+    "underscore" : "*"
   },
   "devDependencies" : {
     "mocha" : "*",
