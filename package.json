@@ -11,6 +11,7 @@
     "error-page" : "*",
     "extendable" : ">=0.0.3",
     "filed": "0",
+    "formidable": "git://github.com/mikefrey/node-formidable.git",
     "glob": "3",
     "keygrip": "~0.2.0",
     "negotiator": "~0.2.3",
