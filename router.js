@@ -72,9 +72,10 @@ exports.register = function(rte, ctlr) {
  */
 
 exports.match = function(req) {
-  var pathname = Url.parse(req.url).pathname
-  var normalPathname = path.normalize(pathname)
+  var url = Url.parse(req.url, true)
+  var normalPathname = path.normalize(url.pathname)
   var match = router.match(normalPathname)
+  match && (match.query = url.query || {})
   return match && match.fn && match.fn(req.method) || null
 }
 

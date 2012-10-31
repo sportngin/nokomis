@@ -156,6 +156,9 @@ describe('Router', function() {
       done()
     })
 
+  })
+
+  describe('Match HTTP Methods', function(){
 
     it('should match single HTTP method', function(done) {
       var handler = {controller:'controller', method:'GET'}
@@ -236,6 +239,27 @@ describe('Router', function() {
       done()
     })
 
+  })
+
+  describe('Match Object', function(){
+
+    it('should have a empty query property without a querystring', function(done) {
+      var handler = {controller:'controller'}
+      router.register('/my/:id', handler)
+
+      var match = router.match({url:'/my/value', method:'GET'})
+      assert(sinon.match.object.test(match.query))
+      done()
+    })
+
+    it('should have a query property with the querystring data', function(done) {
+      var handler = {controller:'controller'}
+      router.register('/my/:id', handler)
+
+      var match = router.match({url:'/my/value?somekey=somevalue', method:'GET'})
+      assert.equal(match.query.somekey, 'somevalue')
+      done()
+    })
 
   })
 
