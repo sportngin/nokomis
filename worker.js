@@ -35,3 +35,4 @@ if (!App) {
 
 // initialize the App
 var app = new App(config)
+module.exports = app

@@ -85,7 +85,9 @@ _.extend(App.prototype, {
     domain.on('error', function(err) {
       try {
         //res.error(500, err)
-        res.end(500)
+        res.statusCode = 500
+        console.log(err)
+        res.end('An error occurred.')
       }
       finally {
         domain.dispose()

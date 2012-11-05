@@ -4,16 +4,17 @@ module.exports.start = function(config) {
 
   var workerScript = './worker.js'
 
-  // debug mode, don't run the cluster, just execute the worker
-  if (~process.argv.indexOf('--debug') || ~process.argv.indexOf('--debug-brk')) {
-    process.argv.append('--worker=' + config.worker)
-    return require(workerScript)
-  }
-
   // init logger
   var logger = require('bunyan').createLogger(config.log || { name:'Nokomis App Master'})
   console.error = logger.info.bind(logger)
   console.log = logger.info.bind(logger)
+
+  // debug mode, don't run the cluster, just execute the worker
+  var argv = process.argv.concat(process.execArgv || [])
+  if (~argv.indexOf('--debug') || ~argv.indexOf('--debug-brk')) {
+    process.argv.push('--worker=' + config.worker, '--config=' + config.config)
+    return require(workerScript)
+  }
 
   // configure the cluster
   var clusterMaster = require("cluster-master")
