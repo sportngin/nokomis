@@ -22,6 +22,9 @@ function Controller(options) {
   // run plugin setup for this controller instance
   this.runPlugins()
 
+  // if the response has already finished, abandon the rest
+  if (this.res.finished) return
+
   // setup request timeout handler
   this.req.on('timeout', this.timeout.bind(this))
 
@@ -148,4 +151,4 @@ _.extend(Controller.prototype, EventEmitter.prototype, {
 })
 
 Controller.extend = extendable
-Plugin.makePluggable(Controller)
+// Plugin.makePluggable(Controller)
