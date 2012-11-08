@@ -9,16 +9,17 @@ module.exports.start = function(config) {
   console.error = logger.info.bind(logger)
   console.log = logger.info.bind(logger)
 
+  var clusterConfig = config.server.cluster || { size:1 }
+
   // debug mode, don't run the cluster, just execute the worker
   var argv = process.argv.concat(process.execArgv || [])
-  if (~argv.indexOf('--debug') || ~argv.indexOf('--debug-brk')) {
+  if (clusterConfig.enabled === false || ~argv.indexOf('--debug') || ~argv.indexOf('--debug-brk')) {
     process.argv.push('--worker=' + config.worker, '--config=' + config.config)
     return require(workerScript)
   }
 
   // configure the cluster
   var clusterMaster = require("cluster-master")
-  var clusterConfig = config.server.cluster || { size:1 }
   clusterConfig.exec = path.resolve(__dirname, './worker.js')
   clusterConfig.args = [
     '--worker=' + config.worker,
