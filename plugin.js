@@ -1,6 +1,7 @@
 
 var extendable = require('extendable')
 var _ = require('underscore')
+var async = require('async')
 
 var Plugin = function(Class, args) {
   var methods = _.clone(this)
@@ -19,7 +20,7 @@ _.extend(Plugin.prototype, {
 
   // Called once for each instance of the extended Class
   // in the context of that instance
-  run: function() {}
+  run: function(instance, callback) { callback() }
 
 })
 
@@ -35,11 +36,12 @@ _.extend(Plugin, {
     // The instance methods added to
     // a Class that is made 'pluggable'
     _.extend(Class.prototype, {
-      runPlugins: function() {
-        var args = [this].concat(_.toArray(arguments))
-        for (var i = 0; i < plugins.length; i++) {
-          plugins[i].run.apply(plugins[i], args)
-        }
+      runPlugins: function(callback) {
+        if (typeof callback != 'function') throw new Error('Callback not provided or not a function')
+        var instance = this
+        async.forEachSeries(plugins, function(plugin, callback) {
+          plugin.run(instance, callback)
+        }, callback)
       }
     })
 

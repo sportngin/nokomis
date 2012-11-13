@@ -20,28 +20,28 @@ function Controller(options) {
   EventEmitter.call(this)
 
   // run plugin setup for this controller instance
-  this.runPlugins()
+  this.runPlugins(function(err) {
+    // if the response has already finished, abandon the rest
+    if (this.res.finished) return
 
-  // if the response has already finished, abandon the rest
-  if (this.res.finished) return
+    // setup request timeout handler
+    this.req.on('timeout', this.timeout.bind(this))
 
-  // setup request timeout handler
-  this.req.on('timeout', this.timeout.bind(this))
+    this.model = {}
 
-  this.model = {}
+    this._done = this._done.bind(this)
+    options.done = this._done
 
-  this._done = this._done.bind(this)
-  options.done = this._done
+    this._defaultMediaType = this.config && this.config.defaultMediaType || 'text/html'
 
-  this._defaultMediaType = this.config && this.config.defaultMediaType || 'text/html'
+    this.initialize.apply(this, arguments)
 
-  this.initialize.apply(this, arguments)
-
-  // Call the `action` if one was matched in the route
-  if (options.route.action) {
-    var action = this[options.route.action]
-    if (action) action.call(this, this._done)
-  }
+    // Call the `action` if one was matched in the route
+    if (options.route.action) {
+      var action = this[options.route.action]
+      if (action) action.call(this, this._done)
+    }
+  }.bind(this))
 }
 
 _.extend(Controller.prototype, EventEmitter.prototype, {
