@@ -3,9 +3,14 @@ var extendable = require('extendable')
 var _ = require('underscore')
 var async = require('async')
 
+var methodBlacklist = ['constructor', 'initialize', 'run']
+
 var Plugin = function(Class, args) {
-  var methods = _.clone(this)
-  _.each(['constructor', 'initialize', 'run'], function(m) { delete methods[m] })
+  var methods = {}
+  for (var key in this) {
+    if (key.charAt(0) != '_' && !~methodBlacklist.indexOf(key))
+      methods[key] = this[key]
+  }
   _.defaults(Class.prototype, methods)
   this.initialize.apply(this, args)
 }

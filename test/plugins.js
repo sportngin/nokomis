@@ -11,7 +11,8 @@ function createPlugin() {
   return Plugin.extend({
     initialize: sinon.spy(),
     run: sinon.spy(Plugin.prototype.run),
-    method: sinon.spy()
+    method: sinon.spy(),
+    _ignored: sinon.spy()
   })
 }
 
@@ -101,6 +102,13 @@ describe('Plugin', function() {
       inst.runPlugins(function(){
         assert(!inst.run)
         assert(!inst.initialize)
+        done()
+      })
+    })
+
+    it('should not add plugin methods prefixed with _', function(done) {
+      inst.runPlugins(function(){
+        assert(!inst._ignored)
         done()
       })
     })
