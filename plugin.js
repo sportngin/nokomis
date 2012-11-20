@@ -11,7 +11,7 @@ var Plugin = function(Class, args) {
     if (key.charAt(0) != '_' && !~methodBlacklist.indexOf(key))
       methods[key] = this[key]
   }
-  _.defaults(Class.prototype, methods)
+  _.extend(Class.prototype, methods)
   this.initialize.apply(this, args)
 }
 

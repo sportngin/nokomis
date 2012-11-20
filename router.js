@@ -44,8 +44,7 @@ exports.register = function(rte, ctlr) {
       // test for HTTP method
       if (!testHTTPMethod(method, handler)) return null
 
-      var controller  = require(controllerPath + handler.controller)
-      this.controller = controller
+      this.controller = findController(handler.controller)
       this.route      = route
       this.action     = handler[method] || handler.action || undefined
 
@@ -90,6 +89,19 @@ exports.setControllerPath = function(path) {
   path = path || '.'
   if (path.substring(path.length-1) !== '/') path += '/'
   controllerPath = path
+}
+
+/**
+ * Finds and returns the controller from the given string
+ *
+ * @param {string} name
+ * @returns {object}
+ * @api public
+ */
+
+var findController = exports.findController = function(name) {
+  if (typeof name !== 'string') return name
+  return require(controllerPath + name)
 }
 
 /**

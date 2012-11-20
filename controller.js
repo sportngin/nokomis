@@ -146,6 +146,21 @@ _.extend(Controller.prototype, EventEmitter.prototype, {
       }
     }
     return true
+  },
+
+  // Transfers this request over to another controller
+  transfer: function(controller, action, data) {
+    // make sure the page can no longer render from this controller
+    this._render = function(){}
+
+    var self = this
+    // use a timeout to let the stack clear before firing the event
+    // since it's possible the handler won't be registered yet.
+    setTimeout(function(){
+      // the app will be listening for a transfer event and
+      // will create a new controller based on the current one
+      self.emit('transfer', self, controller, action, data)
+    }, 1)
   }
 
 })
