@@ -16,6 +16,8 @@ function Controller(options) {
   this.config = options.config
   this.route = options.route
 
+  var args = Array.prototype.slice.call(arguments)
+
   // setup as an event emitter
   EventEmitter.call(this)
 
@@ -34,7 +36,7 @@ function Controller(options) {
 
     this._defaultMediaType = this.config && this.config.defaultMediaType || 'text/html'
 
-    this.initialize.apply(this, arguments)
+    this.initialize.apply(this, args)
 
     // Call the `action` if one was matched in the route
     if (options.route.action) {
