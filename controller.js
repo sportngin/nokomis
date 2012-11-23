@@ -16,6 +16,8 @@ function Controller(options) {
   this.config = options.config
   this.route = options.route
 
+  this.templateOptions = _.extend({}, this.templateOptions)
+
   var args = Array.prototype.slice.call(arguments)
 
   // setup as an event emitter
