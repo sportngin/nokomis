@@ -24,9 +24,13 @@ function Controller(options) {
   EventEmitter.call(this)
 
   // run plugin setup for this controller instance
+  console.log('Running plugins')
   this.runPlugins(function(err) {
     // if the response has already finished, abandon the rest
-    if (this.res.finished) return
+    if (this.res.finished) {
+      console.log('A plugin terminated the response.')
+      return
+    }
 
     // setup request timeout handler
     this.req.on('timeout', this.timeout.bind(this))
@@ -38,10 +42,12 @@ function Controller(options) {
 
     this._defaultMediaType = this.config && this.config.defaultMediaType || 'text/html'
 
+    console.log('Running controller\'s initialize function')
     this.initialize.apply(this, args)
 
     // Call the `action` if one was matched in the route
     if (options.route.action) {
+      console.log('Calling the controller\'s ' + options.route.action + ' action')
       var action = this[options.route.action]
       if (action) action.call(this, this._done)
     }
@@ -64,6 +70,7 @@ _.extend(Controller.prototype, EventEmitter.prototype, {
     var preferredType = this.mediaType()
 
     if (/html$/.test(preferredType)) {
+      console.log('Rendering HTML')
       return this.render(function(err, html){
         if (err) self.error(err)
         if (self.html) return self.html(html)
@@ -72,11 +79,13 @@ _.extend(Controller.prototype, EventEmitter.prototype, {
     }
 
     if (/json$/.test(preferredType)) {
+      console.log('Rendering JSON')
       if (this.json) return this.json(this.serialize())
       throw 'No `json` method implemented'
     }
 
     if (/xml$/.test(preferredType)) {
+      console.log('Rendering XML')
       if (this.xml) return this.xml(this.serialize())
       throw 'No `xml` method implemented'
     }

@@ -48,6 +48,8 @@ exports.register = function(rte, ctlr) {
       this.route      = route
       this.action     = handler[method] || handler.action || undefined
 
+      console.log('Matched ' + route + ' ' + method + ' to ' + handler.controller + '::' + this.action)
+
       // remove `fn` which is this function
       delete this.fn
       return this
