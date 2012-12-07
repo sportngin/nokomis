@@ -8,7 +8,7 @@ var methodBlacklist = ['constructor', 'initialize', 'run']
 var Plugin = function(Class, args) {
   var methods = {}
   for (var key in this) {
-    if (key.charAt(0) != '_' && !~methodBlacklist.indexOf(key))
+    if (key.charAt(0) != '_' && !~methodBlacklist.indexOf(key) && typeof this[key] == 'function')
       methods[key] = this[key]
   }
   _.extend(Class.prototype, methods)
