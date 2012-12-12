@@ -9,6 +9,9 @@ var extendable = require('extendable')
 var master = require('./master')
 var router = require('./router')
 
+// don't limit node's max sockets. The default is 5.
+http.globalAgent.maxSockets = Number.MAX_VALUE
+
 function App(config) {
   // setup as an event emitter
   EventEmitter.call(this)
