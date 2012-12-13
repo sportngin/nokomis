@@ -35,30 +35,39 @@ _.extend(Plugin, {
 
   extend: extendable,
 
-  makePluggable: function(Class) {
-    var plugins = []
-
-    // The instance methods added to
-    // a Class that is made 'pluggable'
-    _.extend(Class.prototype, {
-      runPlugins: function(callback) {
-        if (typeof callback != 'function') throw new Error('Callback not provided or not a function')
-        var instance = this
-        async.forEachSeries(plugins, function(plugin, callback) {
-          plugin.run(instance, callback)
-        }, callback)
-      }
-    })
-
-    // The Class methods added to a
-    // Class that is made 'pluggable'
-    _.extend(Class, {
-      addPlugin: function(PluginClass) {
-        plugins.push(new PluginClass(Class, _.rest(arguments)))
-      }
-    })
-  }
+  makePluggable: makePluggable
 
 })
+
+function makePluggable(Class, plugins) {
+  plugins = [].concat(plugins || [])
+
+  // The instance methods added to
+  // a Class that is made 'pluggable'
+  _.extend(Class.prototype, {
+    runPlugins: function(callback) {
+      if (typeof callback != 'function') throw new Error('Callback not provided or not a function')
+      var instance = this
+      async.forEachSeries(plugins, function(plugin, cb) {
+        plugin.run(instance, cb)
+      }, callback)
+    }
+  })
+
+  // The Class methods added to a
+  // Class that is made 'pluggable'
+  _.extend(Class, {
+    addPlugin: function(PluginClass) {
+      plugins.push(new PluginClass(Class, _.rest(arguments)))
+    }
+  })
+
+  var classExtend = Class.extend
+  Class.extend = function(inst, cls) {
+    var SubClass = classExtend.call(Class, inst, cls)
+    makePluggable(SubClass, plugins)
+    return SubClass
+  }
+}
 
 module.exports = Plugin

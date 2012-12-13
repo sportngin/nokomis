@@ -23,9 +23,17 @@ function Controller(options) {
   // setup as an event emitter
   EventEmitter.call(this)
 
-  // run plugin setup for this controller instance
-  console.log('Running plugins')
-  this.runPlugins(function(err) {
+
+  if (this.runPlugins) {
+    // run plugin setup for this controller instance
+    console.log('Running plugins')
+    this.runPlugins(afterPlugins.bind(this))
+  }
+  else {
+    afterplugins.bind(this)()
+  }
+
+  function afterPlugins(err) {
     // if the response has already finished, abandon the rest
     if (this.res.finished) {
       console.log('A plugin terminated the response.')
@@ -51,7 +59,7 @@ function Controller(options) {
       var action = this[options.route.action]
       if (action) action.call(this, this._done)
     }
-  }.bind(this))
+  }
 }
 
 _.extend(Controller.prototype, EventEmitter.prototype, {
@@ -99,6 +107,12 @@ _.extend(Controller.prototype, EventEmitter.prototype, {
     return this._defaultMediaType
   },
 
+  // Override this method to update data based on the
+  // negotiated content type or any other use case
+  serialize: function() {
+    return this.data
+  },
+
   // Initialize is an empty method by default. Override
   // it with your own initialization logic.
   initialize: function(){},
@@ -123,8 +137,8 @@ _.extend(Controller.prototype, EventEmitter.prototype, {
 
   // A stub for rendering content from a template. Override
   // with your own rendering code.
-  render: function() {
-    return ''
+  render: function(callback) {
+    return callback(null, '')
   },
 
   error: function() {
