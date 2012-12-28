@@ -7,8 +7,10 @@ module.exports = Controller
 
 var EventEmitter = require('events').EventEmitter
 var _ = require('underscore')
+var async = require('async')
 var extendable = require('extendable')
-var Plugin = require('./plugin')
+var lifecycle = require('./lifecycle')
+var Plugin = require('../plugin')
 
 function Controller(options) {
   this.res = options.res
@@ -53,12 +55,18 @@ function Controller(options) {
     console.log('Running controller\'s initialize function')
     this.initialize.apply(this, args)
 
-    // Call the `action` if one was matched in the route
-    if (options.route.action) {
-      console.log('Calling the controller\'s ' + options.route.action + ' action')
-      var action = this[options.route.action]
-      if (action) action.call(this, this._done)
-    }
+    this.runBefore(function(err) {
+      if (err) return this.error(err)
+      var parallelFuncs = [this.runDuring.bind(this)]
+      // Call the `action` if one was matched in the route
+      if (options.route.action) {
+        console.log('Calling the controller\'s ' + options.route.action + ' action')
+        var action = this[options.route.action]
+        if (action) parallelFuncs.push(action.bind(this))
+      }
+      // run 'during' methods and the action if there is one
+      async.parallel(parallelFuncs, this._done)
+    }.bind(this))
   }
 }
 
@@ -67,7 +75,11 @@ _.extend(Controller.prototype, EventEmitter.prototype, {
   // Called when the action method is done populating the
   // this.model object with data.
   _done: function() {
-    this._render()
+    if (this.res.finished) return
+    this.runAfter(function(err) {
+      if (err) return this.error(err)
+      this._render()
+    }.bind(this))
   },
 
   // Determines the best response type based on what the
@@ -82,35 +94,36 @@ _.extend(Controller.prototype, EventEmitter.prototype, {
       return this.render(function(err, html){
         if (err) self.error(err)
         if (self.html) return self.html(html)
-        throw 'No `html` method implemented'
+        throw new Error('No `html` method implemented')
       })
     }
 
     if (/json$/.test(preferredType)) {
       console.log('Rendering JSON')
-      if (this.json) return this.json(this.serialize())
-      throw 'No `json` method implemented'
+      if (this.json) return this.json(this.model)
+      throw new Error('No `json` method implemented')
     }
 
     if (/xml$/.test(preferredType)) {
       console.log('Rendering XML')
-      if (this.xml) return this.xml(this.serialize())
-      throw 'No `xml` method implemented'
+      if (this.xml) return this.xml(this.model)
+      throw new Error('No `xml` method implemented')
     }
 
     this.error(415, 'Media type not supported')
   },
 
+  before: lifecycle.createRegFunction('before'),
+  runBefore: lifecycle.createExecFunction('before'),
+  during: lifecycle.createRegFunction('during'),
+  runDuring: lifecycle.createExecFunction('during'),
+  after: lifecycle.createRegFunction('after'),
+  runAfter: lifecycle.createExecFunction('after'),
+
   // Determines the media type to respond with. Override
   // with your own content negotiation code.
   mediaType: function() {
     return this._defaultMediaType
-  },
-
-  // Override this method to update data based on the
-  // negotiated content type or any other use case
-  serialize: function() {
-    return this.data
   },
 
   // Initialize is an empty method by default. Override
@@ -181,13 +194,13 @@ _.extend(Controller.prototype, EventEmitter.prototype, {
     this._render = function(){}
 
     var self = this
-    // use a timeout to let the stack clear before firing the event
+    // use nextTick to let the stack clear before firing the event
     // since it's possible the handler won't be registered yet.
-    setTimeout(function(){
+    process.nextTick(function(){
       // the app will be listening for a transfer event and
       // will create a new controller based on the current one
       self.emit('transfer', self, controller, action, data)
-    }, 1)
+    })
   }
 
 })

@@ -29,6 +29,7 @@ _.extend(Templating.prototype, {
 
   render: function(tmpl, data, options, callback) {
     var self = this
+    console.log('Rendering template', tmpl)
     this.loadTemplate(tmpl, options, function(err, template) {
       if (err) return callback(err)
 
