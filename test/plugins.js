@@ -179,4 +179,33 @@ describe('Plugin', function() {
 
   })
 
+
+  describe('deep extending', function() {
+    var inst, Zero, One, Two, Three
+
+    it('should correctly walk the prototype chain without plugins', function(done) {
+      Zero = createTestClass()
+      One = Zero.extend({ one: sinon.spy() })
+      Two = One.extend({ two: sinon.spy() })
+      Three = Two.extend({ three: sinon.spy() })
+
+      inst = new Three()
+      assert(!!inst.two)
+      done()
+    })
+
+    it('should not block walking the prototype chain', function(done) {
+      Zero = createTestClass()
+      Plugin.makePluggable(Zero)
+      One = Zero.extend({ one: sinon.spy() })
+      Two = One.extend({ two: sinon.spy() })
+      Three = Two.extend({ three: sinon.spy() })
+
+      inst = new Three()
+      assert(!!inst.two)
+      done()
+    })
+
+  })
+
 })

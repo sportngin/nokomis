@@ -206,4 +206,4 @@ _.extend(Controller.prototype, EventEmitter.prototype, {
 })
 
 Controller.extend = extendable
-// Plugin.makePluggable(Controller)
+Plugin.makePluggable(Controller)

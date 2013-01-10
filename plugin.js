@@ -62,9 +62,8 @@ function makePluggable(Class, plugins) {
     }
   })
 
-  var classExtend = Class.extend
   Class.extend = function(inst, cls) {
-    var SubClass = classExtend.call(Class, inst, cls)
+    var SubClass = extendable.call(Class, inst, cls)
     makePluggable(SubClass, plugins)
     return SubClass
   }
