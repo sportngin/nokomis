@@ -51,20 +51,38 @@ var createExecFunction = module.exports.createExecFunction = function(name) {
 function runItem(item, callback) {
   var filter = item.filter
   if (filter) {
-    var format = this.mediaType()
-    var action = this.route.action
-    // filter out non matching media type formats
-    if (filter.format && !getRegexp(filter.format).test(format)) return callback()
-    // filter out excepted actions
-    if (filter.except && action) {
-      if (Array.isArray(filter.except) && ~filter.except.indexOf(action)) return callback()
-      if (filter.except == action) return callback()
-    }
-    // filter out actions not in `only`
-    if (filter.only && action) {
-      if (Array.isArray(filter.only) && !~filter.only.indexOf(action)) return callback()
-      if (!Array.isArray(filter.only) && filter.only != action) return callback()
+    for (var key in filter) {
+      var func = filterFunctions[key]
+      if (func && func(this, filter[key])) return callback()
     }
   }
   item.method.call(this, callback)
+}
+
+var filterFunctions = {
+  format: function(ctlr, format) {
+    // filter out non matching media type formats
+    var mediaType = ctlr.mediaType()
+    return format && !getRegexp(format).test(mediaType)
+  },
+  except: function(ctlr, except) {
+    // filter out excepted actions
+    var action = ctlr.route.action
+    if (!action) return false
+    if (Array.isArray(except) && ~except.indexOf(action)) return true
+    return except == action
+  },
+  only: function(ctlr, only) {
+    // filter out actions not in `only`
+    var action = ctlr.route.action
+    if (!action) return false
+    if (Array.isArray(only) && !~only.indexOf(action)) return true
+    return !Array.isArray(only) && only != action
+  },
+  verb: function(ctlr, verb) {
+    var method = ctlr.req.method
+    // if (!method) return false
+    if (Array.isArray(verb) && !~verb.indexOf(method)) return true
+    return !Array.isArray(verb) && verb != method
+  }
 }

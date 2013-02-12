@@ -5,6 +5,7 @@ var lifecycle = require('../controller/lifecycle')
 function createTestClass() {
   var TC = function(){
     this.route = {}
+    this.req = {}
   }
   TC.prototype.mediaType = sinon.spy(function() {
     return this.format || 'text/html'
@@ -12,6 +13,7 @@ function createTestClass() {
   TC.prototype.before = lifecycle.createRegFunction('before')
   TC.prototype.runBefore = lifecycle.createExecFunction('before')
   TC.prototype.method = sinon.spy()
+  TC.prototype.func = sinon.spy()
   TC.prototype.asyncMethod = sinon.spy(function(cb) {
     process.nextTick(cb)
   })
@@ -216,6 +218,51 @@ describe('Lifecycle', function() {
       tc.before('method', { only:['otherAction'] })
       tc.runBefore()
       assert(!tc.method.called)
+      done()
+    })
+
+  })
+
+  describe('Verb filter', function() {
+
+    beforeEach(function(done) {
+      TestClass = createTestClass()
+      done()
+    })
+
+    it('should not filter if not present', function(done) {
+      var tc = new TestClass()
+      tc.req.method = 'GET'
+      tc.before('func', {})
+      tc.runBefore()
+      assert(tc.func.calledOnce)
+      done()
+    })
+
+    it('should not filter if verbs match', function(done) {
+      var tc = new TestClass()
+      tc.req.method = 'GET'
+      tc.before('func', { verb:['GET'] })
+      tc.runBefore()
+      assert(tc.func.calledOnce)
+      done()
+    })
+
+    it('should filter if verbs do not match', function(done) {
+      var tc = new TestClass()
+      tc.req.method = 'GET'
+      tc.before('func', { verb:['POST'] })
+      tc.runBefore()
+      assert(!tc.func.called)
+      done()
+    })
+
+    it('should filter if request.method unset', function(done) {
+      var tc = new TestClass()
+      tc.req.method = ''
+      tc.before('func', { verb:['POST'] })
+      tc.runBefore()
+      assert(!tc.func.called)
       done()
     })
 
