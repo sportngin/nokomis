@@ -1,6 +1,6 @@
 {
   "name" : "nokomis",
-  "version" : "0.2.6",
+  "version" : "0.2.7",
   "description" : "A less opinionated web framework for node",
   "main" : "./index.js",
   "dependencies" : {
