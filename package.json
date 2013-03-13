@@ -5,7 +5,7 @@
   "main": "./index.js",
   "dependencies": {
     "async": "~0.1.x",
-    "bunyan": "~0.14.x",
+    "bunyan": "~0.18.x",
     "cluster-master": "~0.0.x",
     "extendable": "git://github.com/mikefrey/extendable-1",
     "glob": "~3.1.x",
