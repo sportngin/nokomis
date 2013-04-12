@@ -6,7 +6,7 @@ module.exports.start = function(config) {
   var workerScript = './worker.js'
 
   // init logger
-  var logger = bunyan.createLogger(config.log || { name:'Nokomis App Master'})
+  var logger = bunyan.createLogger(config.logging || { name:'Nokomis App Master'})
   console.error = logger.error.bind(logger)
   console.warn = logger.warn.bind(logger)
   console.log = logger.info.bind(logger)
