@@ -1,13 +1,16 @@
 var path = require('path')
+var bunyan = require('bunyan')
 
 module.exports.start = function(config) {
 
   var workerScript = './worker.js'
 
   // init logger
-  var logger = require('bunyan').createLogger(config.log || { name:'Nokomis App Master'})
-  console.error = logger.info.bind(logger)
+  var logger = bunyan.createLogger(config.log || { name:'Nokomis App Master'})
+  console.error = logger.error.bind(logger)
+  console.warn = logger.warn.bind(logger)
   console.log = logger.info.bind(logger)
+  console.trace = logger.trace.bind(logger)
 
   var clusterConfig = config.server.cluster || { size:1 }
 
