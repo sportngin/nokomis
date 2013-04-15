@@ -17,6 +17,7 @@ function Controller(options) {
   this.req = options.req
   this.config = options.config
   this.route = options.route
+  this.log = this.req.log
 
   this.templateOptions = _.extend({}, this.templateOptions)
 
@@ -28,7 +29,7 @@ function Controller(options) {
 
   if (this.runPlugins) {
     // run plugin setup for this controller instance
-    console.log('Running plugins')
+    this.log.info('Running plugins')
     this.runPlugins(afterPlugins.bind(this))
   }
   else {
@@ -38,7 +39,7 @@ function Controller(options) {
   function afterPlugins(err) {
     // if the response has already finished, abandon the rest
     if (this.res.finished) {
-      console.log('A plugin terminated the response.')
+      this.log.info('A plugin terminated the response.')
       return
     }
 
@@ -52,7 +53,7 @@ function Controller(options) {
 
     this._defaultMediaType = this.config && this.config.defaultMediaType || 'text/html'
 
-    console.log('Running controller\'s initialize function')
+    this.log.info('Running controller\'s initialize function')
     this.initialize.apply(this, args)
 
     this.runBefore(function(err) {
@@ -60,7 +61,7 @@ function Controller(options) {
       var parallelFuncs = [this.runDuring.bind(this)]
       // Call the `action` if one was matched in the route
       if (options.route.action) {
-        console.log('Calling the controller\'s ' + options.route.action + ' action')
+        this.log.info('Calling the controller\'s ' + options.route.action + ' action')
         var action = this[options.route.action]
         if (action) parallelFuncs.push(action.bind(this))
       }
@@ -90,7 +91,7 @@ _.extend(Controller.prototype, EventEmitter.prototype, {
     var preferredType = this.mediaType()
 
     if (/html$/.test(preferredType)) {
-      console.log('Rendering HTML')
+      this.log.info('Rendering HTML')
       return this.render(function(err, html){
         if (err) self.error(err)
         if (self.html) return self.html(html)
@@ -99,13 +100,13 @@ _.extend(Controller.prototype, EventEmitter.prototype, {
     }
 
     if (/json$/.test(preferredType)) {
-      console.log('Rendering JSON')
+      this.log.info('Rendering JSON')
       if (this.json) return this.json(this.model)
       throw new Error('No `json` method implemented')
     }
 
     if (/xml$/.test(preferredType)) {
-      console.log('Rendering XML')
+      this.log.info('Rendering XML')
       if (this.xml) return this.xml(this.model)
       throw new Error('No `xml` method implemented')
     }

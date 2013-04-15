@@ -8,6 +8,7 @@ var extendable = require('extendable')
 
 var master = require('./master')
 var router = require('./router')
+var logger = require('./logger')
 
 // don't limit node's max sockets. The default is 5.
 http.globalAgent.maxSockets = Number.MAX_VALUE
@@ -53,6 +54,8 @@ _.extend(App.prototype, EventEmitter.prototype, {
 
   // handle the individual http requests coming in
   handleRequest: function(req, res) {
+    // add a logger to the req and res
+    logger.setup(req, res, this.config.logger)
 
     // match a controller from the router
     var route = req.route = this.router.match(req)
