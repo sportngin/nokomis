@@ -24,6 +24,12 @@ function getBareRequest() {
   req.contentNegotiator = {
     preferredMediaType: sinon.stub().returns('text/html')
   }
+  req.log = {
+    info: sinon.spy(),
+    warn: sinon.spy(),
+    trace: sinon.spy(),
+    error: sinon.spy()
+  }
 
   //sinon.stub(req.socket, 'address')
 
