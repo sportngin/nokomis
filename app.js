@@ -55,7 +55,7 @@ _.extend(App.prototype, EventEmitter.prototype, {
   // handle the individual http requests coming in
   handleRequest: function(req, res) {
     // add a logger to the req and res
-    logger.setup(req, res, this.config.logger)
+    logger.setup(req, res, this.config.logging)
 
     // match a controller from the router
     var route = req.route = this.router.match(req)
