@@ -112,22 +112,33 @@ describe('Router', function() {
 
   describe('Match', function(){
 
+    var req
+
+    beforeEach(function() {
+      req = {
+        url: '/your/value',
+        method: 'GET',
+        log: { info: sinon.spy(), error: sinon.spy() }
+      }
+    })
+
     it('should have a match method', function(done) {
       assert(router.match)
       done()
     })
 
     it('should return falsey value when the url does not match a route', function(done) {
-      var match = router.match({url:'dont match anything', method:'GET'})
+      req.url = 'dont match anything'
+      var match = router.match(req)
       assert(!match)
       done()
     })
 
     it('should match when the url correctly matches a route', function(done) {
       var handler = {controller:'controller'}
-      router.register('/my/:id', handler)
+      router.register('/your/:id', handler)
 
-      var match = router.match({url:'/my/value', method:'GET'})
+      var match = router.match(req)
       assert.equal(typeof match, 'object')
       assert.equal(match.controller, controller)
       assert(!match.action)
@@ -138,7 +149,7 @@ describe('Router', function() {
       var handler = {controller:'controller', action:'action'}
       router.register('/your/:id', handler)
 
-      var match = router.match({url:'/your/value', method:'GET'})
+      var match = router.match(req)
       assert.equal(typeof match, 'object')
       assert.equal(match.controller, controller)
       assert.equal(match.action, 'action')
@@ -149,7 +160,7 @@ describe('Router', function() {
       var handler = {controller:'controller', action:''}
       router.register('/your/:id', handler)
 
-      var match = router.match({url:'/your/value', method:'GET'})
+      var match = router.match(req)
       assert.equal(typeof match, 'object')
       assert.equal(match.controller, controller)
       assert.equal(match.action, undefined)
@@ -160,11 +171,21 @@ describe('Router', function() {
 
   describe('Match HTTP Methods', function(){
 
+    var req
+
+    beforeEach(function() {
+      req = {
+        url: '/your/value',
+        method: 'GET',
+        log: { info: sinon.spy(), error: sinon.spy() }
+      }
+    })
+
     it('should match single HTTP method', function(done) {
       var handler = {controller:'controller', method:'GET'}
       router.register('/your/:id', handler)
 
-      var match = router.match({url:'/your/value', method:'GET'})
+      var match = router.match(req)
       assert.equal(typeof match, 'object')
       assert.equal(match.controller, controller)
       done()
@@ -174,11 +195,12 @@ describe('Router', function() {
       var handler = {controller:'controller', method:['GET','POST']}
       router.register('/your/:id', handler)
 
-      var match = router.match({url:'/your/value', method:'GET'})
+      var match = router.match(req)
       assert.equal(typeof match, 'object')
       assert.equal(match.controller, controller)
 
-      match = router.match({url:'/your/value', method:'POST'})
+      req.method = 'POST'
+      match = router.match(req)
       assert.equal(typeof match, 'object')
       assert.equal(match.controller, controller)
       done()
@@ -188,7 +210,8 @@ describe('Router', function() {
       var handler = {controller:'controller', method:['GET','POST']}
       router.register('/your/:id', handler)
 
-      var match = router.match({url:'/your/value', method:'PUT'})
+      req.method = 'PUT'
+      var match = router.match(req)
       assert(!match)
       done()
     })
@@ -197,7 +220,7 @@ describe('Router', function() {
       var handler = {controller:'controller', GET:'index'}
       router.register('/your/:id', handler)
 
-      var match = router.match({url:'/your/value', method:'GET'})
+      var match = router.match(req)
       assert.equal(typeof match, 'object')
       assert.equal(match.controller, controller)
       assert.equal(match.action, 'index')
@@ -208,12 +231,13 @@ describe('Router', function() {
       var handler = {controller:'controller', GET:'index', POST:'create'}
       router.register('/your/:id', handler)
 
-      var match = router.match({url:'/your/value', method:'GET'})
+      var match = router.match(req)
       assert.equal(typeof match, 'object')
       assert.equal(match.controller, controller)
       assert.equal(match.action, 'index')
 
-      match = router.match({url:'/your/value', method:'POST'})
+      req.method = 'POST'
+      match = router.match(req)
       assert.equal(typeof match, 'object')
       assert.equal(match.controller, controller)
       assert.equal(match.action, 'create')
@@ -227,11 +251,12 @@ describe('Router', function() {
       router.register('/your/:id', handler2)
 
       // this shouldn't match
-      var match = router.match({url:'/your/value', method:'GET'})
+      var match = router.match(req)
       assert(!match)
 
       // this should match
-      match = router.match({url:'/your/value', method:'POST'})
+      req.method = 'POST'
+      match = router.match(req)
       assert(match)
       assert.equal(typeof match, 'object')
       assert.equal(match.controller, controller)
@@ -243,20 +268,31 @@ describe('Router', function() {
 
   describe('Match Object', function(){
 
+    var req
+
+    beforeEach(function() {
+      req = {
+        url: '/your/value',
+        method: 'GET',
+        log: { info: sinon.spy(), error: sinon.spy() }
+      }
+    })
+
     it('should have a empty query property without a querystring', function(done) {
       var handler = {controller:'controller'}
-      router.register('/my/:id', handler)
+      router.register('/your/:id', handler)
 
-      var match = router.match({url:'/my/value', method:'GET'})
+      var match = router.match(req)
       assert(sinon.match.object.test(match.query))
       done()
     })
 
     it('should have a query property with the querystring data', function(done) {
       var handler = {controller:'controller'}
-      router.register('/my/:id', handler)
+      router.register('/your/:id', handler)
 
-      var match = router.match({url:'/my/value?somekey=somevalue', method:'GET'})
+      req.url = '/your/value?somekey=somevalue'
+      var match = router.match(req)
       assert.equal(match.query.somekey, 'somevalue')
       done()
     })

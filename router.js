@@ -36,10 +36,11 @@ exports.register = function(rte, ctlr) {
   Object.keys(rts).forEach(function(route) {
     // define each route and provide a custom handler for it
     // router.define(route, function() {
-    router.addRoute(route, function(method) {
+    router.addRoute(route, function(req) {
       // fetch the controller and determine
       // whether or not to use an action
       var handler = rts[route]
+      var method = req.method
 
       // test for HTTP method
       if (!testHTTPMethod(method, handler)) return null
@@ -48,7 +49,7 @@ exports.register = function(rte, ctlr) {
       this.route      = route
       this.action     = handler[method] || handler.action || undefined
 
-      console.log('Matched ' + route + ' ' + method + ' to ' + handler.controller + '::' + this.action)
+      req.log.info('Matched ' + route + ' ' + method + ' to ' + handler.controller + '::' + this.action)
 
       // remove `fn` which is this function
       delete this.fn
@@ -77,7 +78,7 @@ exports.match = function(req) {
   var normalPathname = path.normalize(url.pathname)
   var match = router.match(normalPathname)
   match && (match.query = url.query || {})
-  return match && match.fn && match.fn(req.method) || null
+  return match && match.fn && match.fn(req) || null
 }
 
 /**
