@@ -10,7 +10,8 @@
     "extendable": "git://github.com/mikefrey/extendable-1",
     "glob": "~3.1.x",
     "routes": "~0.1.x",
-    "underscore": "~1.4.x"
+    "underscore": "~1.4.x",
+    "graceful-fs": "~2.0.x"
   },
   "devDependencies": {
     "mocha": "*",

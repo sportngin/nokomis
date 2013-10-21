@@ -1,4 +1,5 @@
 var http = require('http')
+var fs = require('graceful-fs')
 var path = require('path')
 var Domain = require('domain')
 var EventEmitter = require('events').EventEmitter
