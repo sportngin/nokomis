@@ -26,6 +26,8 @@ function Controller(options) {
   // setup as an event emitter
   EventEmitter.call(this)
 
+  this.log.info('Before plugins')
+  this.beforePlugins.apply(this, args)
 
   if (this.runPlugins) {
     // run plugin setup for this controller instance
@@ -33,7 +35,7 @@ function Controller(options) {
     this.runPlugins(afterPlugins.bind(this))
   }
   else {
-    afterplugins.bind(this)()
+    afterplugins.call(this)
   }
 
   function afterPlugins(err) {
@@ -126,6 +128,10 @@ _.extend(Controller.prototype, EventEmitter.prototype, {
   mediaType: function() {
     return this._defaultMediaType
   },
+
+  // beforePlugins is an empty method by default and runs before
+  // plugins are run. Override it with your own logic.
+  beforePlugins: function() {},
 
   // Initialize is an empty method by default. Override
   // it with your own initialization logic.
