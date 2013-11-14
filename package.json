@@ -21,6 +21,9 @@
     "node": ">=0.8.0",
     "npm": ">=1.2.0"
   },
+  "licenses": [{
+    "type": "MIT"
+  }],
   "repository": {
     "type": "git",
     "url": "git://github.com/tstmedia/nokomis.git"
