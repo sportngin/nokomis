@@ -45,6 +45,7 @@ exports.register = function(rte, ctlr) {
       // test for HTTP method
       if (!testHTTPMethod(method, handler)) return null
 
+      this.controllerName = handler.controller
       this.controller = findController(handler.controller)
       this.route      = route
       this.action     = handler[method] || handler.action || undefined
