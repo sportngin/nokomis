@@ -6,11 +6,25 @@ var logger
 exports.setup = function(req, res, config) {
   if (!logger) logger = bunyan.createLogger(config || { name:'Nokomis App' })
 
-  res.log = req.log = logger.child({
+  var log = res.log = req.log = logger.child({
     serializers: bunyan.stdSerializers,
     req_id: crypto.randomBytes(4).toString('hex'),
     session: req.sessionToken
   })
+
+  // high resolution timer on log
+  var timerCache = {}
+  log.time = function(str) {
+    if (!timerCache[str])
+      timerCache[str] = process.hrtime()
+  }
+  log.timeEnd = function(str) {
+    if (!timerCache[str]) return
+    var diff = process.hrtime(timerCache[str])
+    var ms = diff[0] * 1e3 + diff[1] / 1e6
+    log.info(str+': ' + ms.toFixed(3) + 'ms')
+    timerCache[str] = null
+  }
 
   // log basic info about the request
   req.log.info('Request recieved:', req.method, req.url)
