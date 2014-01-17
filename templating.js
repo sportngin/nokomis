@@ -30,10 +30,12 @@ _.extend(Templating.prototype, {
   render: function(tmpl, data, options, callback) {
     var self = this
     console.log('Rendering template', tmpl)
+    console.time('Template rendered in')
     this.loadTemplate(tmpl, options, function(err, template) {
       if (err) return callback(err)
 
       self.renderTemplate(template, data, function(err, result) {
+        console.timeEnd('Template rendered in')
         if (err) return callback(err)
         if (options.layout === false)
           return callback(err, result)
