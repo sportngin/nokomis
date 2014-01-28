@@ -167,6 +167,16 @@ describe('Router', function() {
       done()
     })
 
+    it('should match with regexp', function(done) {
+      var handler = {controller:'controller', regexp:true}
+      router.register('^/your/.*$', handler)
+
+      var match = router.match(req)
+      assert.equal(typeof match, 'object')
+      assert.equal(match.controller, controller)
+      done()
+    })
+
   })
 
   describe('Match HTTP Methods', function(){
