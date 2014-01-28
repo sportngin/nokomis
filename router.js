@@ -33,13 +33,15 @@ exports.register = function(rte, ctlr) {
   _.extend(routes, rts)
 
 
-  Object.keys(rts).forEach(function(route) {
+  Object.keys(rts).forEach(function(key) {
+    var route = key
+    if (rts[route].regexp === true) route = new RegExp(route, 'i')
+
     // define each route and provide a custom handler for it
-    // router.define(route, function() {
     router.addRoute(route, function(req) {
       // fetch the controller and determine
       // whether or not to use an action
-      var handler = rts[route]
+      var handler = rts[key]
       var method = req.method
 
       // test for HTTP method
@@ -47,10 +49,10 @@ exports.register = function(rte, ctlr) {
 
       this.controllerName = handler.controller
       this.controller = findController(handler.controller)
-      this.route      = route
+      this.route      = key
       this.action     = handler[method] || handler.action || undefined
 
-      req.log.info('Matched ' + route + ' ' + method + ' to ' + handler.controller + '::' + this.action)
+      req.log.info('Matched ' + key + ' ' + method + ' to ' + handler.controller + '::' + this.action)
 
       // remove `fn` which is this function
       delete this.fn
