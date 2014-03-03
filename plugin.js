@@ -58,7 +58,9 @@ function makePluggable(Class, plugins) {
   // Class that is made 'pluggable'
   _.extend(Class, {
     addPlugin: function(PluginClass) {
-      plugins.push(new PluginClass(Class, _.rest(arguments)))
+      var plugin = new PluginClass(Class, _.rest(arguments))
+      plugins.push(plugin)
+      return plugin
     }
   })
 
