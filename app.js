@@ -82,12 +82,7 @@ _.extend(App.prototype, EventEmitter.prototype, {
       controller.once('transfer', this.transfer.bind(this))
     }.bind(this)
 
-    var env = this.config.NODE_ENV
-    if (env && env !== 'development') {
-      this.wrapWithDomain(res, run)
-    } else {
-      run()
-    }
+    this.wrapWithDomain(res, run)
   },
 
   wrapWithDomain: function(res, run) {
