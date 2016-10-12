@@ -66,7 +66,10 @@ _.extend(App.prototype, EventEmitter.prototype, {
 
     function run() {
       // without a matching route, send a 404
-      if (!route) return error(404, 'No route matched for ' + req.url
+      if (!route) {
+        var msg = 'No route matched for ' + req.url
+        return error(404, msg)
+      }
 
       // run matched controller
       var controller = new route.controller({
@@ -78,9 +81,9 @@ _.extend(App.prototype, EventEmitter.prototype, {
       controller.once('transfer', this.transfer.bind(this))
     }
 
-    function defaultError(code, msg) {
+    function defaultError() {
       console.log(msg)
-      res.statusCode = code
+      res.statusCode = 404
       res.setHeader('content-type', 'text/plain')
       return res.end(msg)
     }
