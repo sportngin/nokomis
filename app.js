@@ -66,7 +66,7 @@ _.extend(App.prototype, EventEmitter.prototype, {
 
     function run() {
       // without a matching route, send a 404
-      if (!route) return error(404, 'No route matched for ' + req.url)
+      if (!route) return error(404, 'No route matched for ' + req.url
 
       // run matched controller
       var controller = new route.controller({
