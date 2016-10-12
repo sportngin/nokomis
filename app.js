@@ -60,16 +60,15 @@ _.extend(App.prototype, EventEmitter.prototype, {
 
     // match a controller from the router
     var route = req.route = this.router.match(req)
+    var error = typeof this.error === 'function' ? this.error : defaultError
 
-    var run = function() {
+    this.wrapWithDomain(res, run.bind(this))
+
+    function run() {
       // without a matching route, send a 404
       if (!route) {
         var msg = 'No route matched for ' + req.url
-        console.log(msg)
-
-        res.statusCode = 404
-        res.setHeader('content-type', 'text/plain')
-        return res.end(msg)
+        return error(404, msg)
       }
 
       // run matched controller
@@ -80,9 +79,14 @@ _.extend(App.prototype, EventEmitter.prototype, {
         config: this.config
       })
       controller.once('transfer', this.transfer.bind(this))
-    }.bind(this)
+    }
 
-    this.wrapWithDomain(res, run)
+    function defaultError() {
+      console.log(msg)
+      res.statusCode = 404
+      res.setHeader('content-type', 'text/plain')
+      return res.end(msg)
+    }
   },
 
   wrapWithDomain: function(res, run) {
