@@ -79,7 +79,9 @@ exports.register = function(rte, ctlr) {
 exports.match = function(req) {
   var url = Url.parse(req.url, true)
   var normalPathname = path.normalize(url.pathname)
-  var match = router.match(normalPathname)
+  var match
+  try { match = router.match(normalPathname) }
+  catch(e) { /* the route plugin can error */ }
   match && (match.query = url.query || {})
   return match && match.fn && match.fn(req) || null
 }
