@@ -61,6 +61,12 @@ function makePluggable(Class, plugins) {
       var plugin = new PluginClass(Class, _.rest(arguments))
       plugins.push(plugin)
       return plugin
+    },
+    removePlugin: function(PluginClass) {
+      plugins = plugins.filter(function(element) {
+        return !(element instanceof PluginClass)
+      })
+      return null
     }
   })
 

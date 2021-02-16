@@ -12,7 +12,7 @@ var router = require('./router')
 var logger = require('./logger')
 
 // don't limit node's max sockets. The default is 5.
-http.globalAgent.maxSockets = Number.MAX_VALUE
+http.globalAgent.maxSockets = 4096 //Number.MAX_VALUE
 
 function App(config) {
   // setup as an event emitter
@@ -40,6 +40,7 @@ _.extend(App.prototype, EventEmitter.prototype, {
 
     // Setup HTTP server
     var server = http.createServer(this.handleRequest.bind(this))
+    server.keepAliveTimeOut = 65 * 1000
 
     // start the server
     server.listen(config.port, function(){
