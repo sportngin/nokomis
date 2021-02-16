@@ -40,7 +40,7 @@ _.extend(App.prototype, EventEmitter.prototype, {
 
     // Setup HTTP server
     var server = http.createServer(this.handleRequest.bind(this))
-    server.keepAliveTimeOut = config.keepAliveTimeout || 65 * 1000
+    server.keepAliveTimeout = config.keepAliveTimeout || 65 * 1000
 
     // start the server
     server.listen(config.port, function(){
