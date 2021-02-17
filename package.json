@@ -1,6 +1,6 @@
 {
   "name": "nokomis",
-  "version": "0.2.16",
+  "version": "0.2.17",
   "description": "A less opinionated web framework for node",
   "main": "./index.js",
   "dependencies": {
@@ -28,7 +28,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/tstmedia/nokomis.git"
+    "url": "git://github.com/sportngin/nokomis.git"
   },
   "scripts": {
     "test": "NODE_ENV=test mocha -R spec"
